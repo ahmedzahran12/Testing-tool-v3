@@ -77,7 +77,7 @@ class OrderService {
       throw new ApiError(500, `Failed to delete order with ID ${orderId} for an unknown reason.`);
     }
   }
-
+// List paid orders
   async listPaidOrders(): Promise<Order[]> {
     const allOrders = await orderRepository.findAll();
     return allOrders.filter(order => order.paid === true);
