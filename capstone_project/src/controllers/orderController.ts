@@ -8,7 +8,13 @@ class OrderController {
   async createOrder(req: Request, res: Response, next: NextFunction) {
     try {
       await validate(createOrderSchema)(req, res, () => {});
-      const { customerId, items } = req.body;
+      // Use req.user.id for customer role, otherwise allow admin to set customerId
+      let { customerId, items } = req.body;
+
+      if (req.user?.role === 'customer') {
+          customerId = req.user.id;
+      }
+
       const newOrder = await orderService.createOrder(customerId, items);
       res.status(201).json(newOrder);
     } catch (error) {
