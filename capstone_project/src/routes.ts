@@ -31,8 +31,8 @@ router.put('/items/:id', authMiddleware, authorizeRoles(['admin']), itemControll
 router.delete('/items/:id', authMiddleware, authorizeRoles(['admin']), itemController.delete);
 
 // Order Routes
-// Create orders (Admin only)
-router.post('/orders', authMiddleware, authorizeRoles(['admin']), orderController.createOrder);
+// Create orders (Customer and Admin)
+router.post('/orders', authMiddleware, authorizeRoles(['admin', 'customer']), orderController.createOrder);
 // List orders (Customer and Admin) - customer can only list their own, admin can list all
 router.get('/orders', authMiddleware, orderController.listOrders);
 // Delete order (Admin only)

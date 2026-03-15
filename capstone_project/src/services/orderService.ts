@@ -77,7 +77,7 @@ class OrderService {
       throw new ApiError(500, `Failed to delete order with ID ${orderId} for an unknown reason.`);
     }
   }
-
+// List paid orders
   async listPaidOrders(): Promise<Order[]> {
     const allOrders = await orderRepository.findAll();
     return allOrders.filter(order => order.paid === true);
@@ -88,15 +88,13 @@ class OrderService {
     if (!orderToCheckout) {
       throw new ApiError(404, `Order with ID ${orderId} not found.`);
     }
-    if (orderToCheckout.customerId !== customerId) {
-      throw new ApiError(401, 'Unauthorized: This order does not belong to the provided customer ID.');
-    }
+
     if (orderToCheckout.paid) {
       throw new ApiError(400, `Order with ID ${orderId} has already been paid.`);
     }
 
     orderToCheckout.paid = true;
-    orderToCheckout.status = 'paid'; // Update status to 'paid'
+    orderToCheckout.status = 'paid';
 
     await orderRepository.update(orderId, orderToCheckout);
     return orderToCheckout;

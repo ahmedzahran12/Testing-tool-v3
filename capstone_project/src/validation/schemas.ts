@@ -73,11 +73,9 @@ export const orderItemSchema = Joi.object({
 export const createOrderSchema = Joi.object({
   customerId: Joi.string()
     .alphanum() // Customer IDs are typically alphanumeric
-    .required()
+    .optional() // customerId is optional because it can be inferred from the logged-in user
     .messages({
       'string.alphanum': 'Customer ID must be alphanumeric.',
-      'string.empty': 'Customer ID cannot be empty.',
-      'any.required': 'Customer ID is required.',
     }),
   items: Joi.array()
     .items(orderItemSchema)
