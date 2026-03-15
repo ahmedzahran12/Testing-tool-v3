@@ -88,19 +88,13 @@ class OrderService {
     if (!orderToCheckout) {
       throw new ApiError(404, `Order with ID ${orderId} not found.`);
     }
-    // VULNERABILITY: Removed the check that ensures the user checking out the order
-    // is the same as the customer who created it.
-    /*
-    if (orderToCheckout.customerId !== customerId) {
-      throw new ApiError(401, 'Unauthorized: This order does not belong to the provided customer ID.');
-    }
-    */
+
     if (orderToCheckout.paid) {
       throw new ApiError(400, `Order with ID ${orderId} has already been paid.`);
     }
 
     orderToCheckout.paid = true;
-    orderToCheckout.status = 'paid'; // Update status to 'paid'
+    orderToCheckout.status = 'paid';
 
     await orderRepository.update(orderId, orderToCheckout);
     return orderToCheckout;
