@@ -45,6 +45,15 @@ export const itemSchema = Joi.object({
       'number.min': 'Stock cannot be negative.',
       'any.required': 'Stock is required.',
     }),
+  discount: Joi.number()
+    .min(0)
+    .max(100)
+    .optional()
+    .messages({
+      'number.base': 'Discount must be a number.',
+      'number.min': 'Discount cannot be negative.',
+      'number.max': 'Discount cannot exceed 100.',
+    }),
 });
 
 // Schema for individual items within an order

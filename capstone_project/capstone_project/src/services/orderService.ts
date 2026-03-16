@@ -17,24 +17,32 @@ class OrderService {
     let total = 0;
 
     for (const itemDetail of itemsDetails) {
-      // itemService.findById now throws ApiError(404) if not found
-      const item = await itemService.findById(itemDetail.itemId); 
+      // itemService.findById throws ApiError(404) if not found
+      const item = await itemService.findById(itemDetail.itemId);
       if (item.stock < itemDetail.quantity) {
         throw new ApiError(400, `Not enough stock for item: ${item.name}. Available: ${item.stock}, Requested: ${itemDetail.quantity}`);
       }
-      
+
+      // Snapshot the discount at order creation time
+      const discount = item.discount ?? 0;
+      const discountedPrice = item.price * (1 - discount / 100);
+
       const orderItem: OrderItem = {
         itemId: item.id,
         name: item.name,
         price: item.price,
+        discount,
         quantity: itemDetail.quantity,
       };
       orderItems.push(orderItem);
-      total += item.price * itemDetail.quantity;
+      total += discountedPrice * itemDetail.quantity;
 
       // Decrement stock
       await itemService.update(item.id, { stock: item.stock - itemDetail.quantity });
     }
+
+    // Round total to 2 decimal places to avoid floating point drift
+    total = Math.round(total * 100) / 100;
 
     const newOrder: Order = {
       id: Date.now().toString(),
@@ -65,15 +73,14 @@ class OrderService {
     }
 
     // Re-increment stock for deleted order items (simplified rollback)
+    // Stock rollback uses quantity only — discount does not affect stock counts
     for (const orderItem of orderToDelete.items) {
-      // itemService.findById now throws ApiError(404) if not found
-      const item = await itemService.findById(orderItem.itemId); 
+      const item = await itemService.findById(orderItem.itemId);
       await itemService.update(item.id, { stock: item.stock + orderItem.quantity });
     }
 
     const deleted = await orderRepository.delete(orderId);
     if (!deleted) {
-      // This case should ideally not happen if findById passed
       throw new ApiError(500, `Failed to delete order with ID ${orderId} for an unknown reason.`);
     }
   }
@@ -96,7 +103,7 @@ class OrderService {
     }
 
     orderToCheckout.paid = true;
-    orderToCheckout.status = 'paid'; // Update status to 'paid'
+    orderToCheckout.status = 'paid';
 
     await orderRepository.update(orderId, orderToCheckout);
     return orderToCheckout;

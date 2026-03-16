@@ -27,7 +27,11 @@ class ItemService {
     if (itemData.stock < 0) {
       throw new ApiError(400, 'Item stock cannot be negative.');
     }
-    return itemRepository.create(itemData);
+    if (itemData.discount !== undefined && (itemData.discount < 0 || itemData.discount > 100)) {
+      throw new ApiError(400, 'Item discount must be between 0 and 100.');
+    }
+    // Default discount to 0 if not provided
+    return itemRepository.create({ ...itemData, discount: itemData.discount ?? 0 });
   }
 
   async update(id: string, itemData: Partial<Item>): Promise<Item> {
@@ -41,6 +45,9 @@ class ItemService {
     }
     if (itemData.stock !== undefined && itemData.stock < 0) {
       throw new ApiError(400, 'Item stock cannot be negative.');
+    }
+    if (itemData.discount !== undefined && (itemData.discount < 0 || itemData.discount > 100)) {
+      throw new ApiError(400, 'Item discount must be between 0 and 100.');
     }
 
     const updatedItem = { ...existingItem, ...itemData, id };
