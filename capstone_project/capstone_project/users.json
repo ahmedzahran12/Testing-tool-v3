@@ -1,0 +1,30 @@
+[
+  {
+    "username": "admin",
+    "password": "adminpassword",
+    "isAdmin": true,
+    "details": "This is the admin user"
+  },
+  {
+    "username": "user1",
+    "password": "userpassword",
+    "isAdmin": false,
+    "details": "This is a regular user"
+  },
+  {
+    "username": "user2",
+    "password": "userpassword",
+    "isAdmin": false,
+    "details": "This is a regular user"
+  },{
+    "username": "user3",
+    "password": "userpassword",
+    "isAdmin": false,
+    "details": "This is a regular user"
+  },{
+    "username": "user4",
+    "password": "userpassword",
+    "isAdmin": false,
+    "details": "This is a regular user"
+  }
+]
