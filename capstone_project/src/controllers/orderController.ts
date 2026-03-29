@@ -66,6 +66,24 @@ class OrderController {
       next(error);
     }
   }
+  async cancelOrder(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const customerId = req.user?.id;
+
+      if (!orderId) {
+        throw new ApiError(400, 'Order ID is required.');
+      }
+      if (!customerId) {
+        throw new ApiError(401, 'Authentication required: Customer ID not found.');
+      }
+
+      const cancelledOrder = await orderService.cancelOrder(orderId, customerId);
+      res.status(200).json(cancelledOrder);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const orderController = new OrderController();

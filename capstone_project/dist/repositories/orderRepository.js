@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jsonRepository = void 0;
+exports.orderRepository = void 0;
+// src/repositories/orderRepository.ts
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const storageKey_1 = require("../utils/storageKey");
 const dataDir = path_1.default.join(__dirname, '../data');
-class JsonRepository {
+class OrderRepository {
     ensureDataDir() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -28,14 +29,14 @@ class JsonRepository {
             }
         });
     }
-    create(id, data) {
+    create(order) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.ensureDataDir();
-            const filePath = path_1.default.join(dataDir, `${(0, storageKey_1.storageKey)(id)}.json`);
-            yield promises_1.default.writeFile(filePath, JSON.stringify(data, null, 2));
+            const filePath = path_1.default.join(dataDir, `${(0, storageKey_1.storageKey)(order.id)}.json`);
+            yield promises_1.default.writeFile(filePath, JSON.stringify(order, null, 2));
         });
     }
-    get(id) {
+    findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const filePath = path_1.default.join(dataDir, `${(0, storageKey_1.storageKey)(id)}.json`);
             try {
@@ -43,15 +44,40 @@ class JsonRepository {
                 return JSON.parse(data);
             }
             catch (error) {
-                return null;
+                if (error.code === 'ENOENT') {
+                    return null; // File not found
+                }
+                throw new Error(`Error reading order file: ${error.message}`);
             }
         });
     }
-    update(id, data) {
+    findAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureDataDir();
+            const files = yield promises_1.default.readdir(dataDir);
+            const orderFiles = files.filter(file => file.endsWith('.json') && !file.includes('items.json') && !file.includes('users.json')); // Exclude items.json and users.json
+            const orders = [];
+            for (const file of orderFiles) {
+                try {
+                    const data = yield promises_1.default.readFile(path_1.default.join(dataDir, file), 'utf-8');
+                    const order = JSON.parse(data);
+                    // Basic validation to ensure it's an order object
+                    if (order.id && order.customerId && order.items && order.total !== undefined) {
+                        orders.push(order);
+                    }
+                }
+                catch (error) {
+                    console.error(`Error reading or parsing file ${file}:`, error);
+                }
+            }
+            return orders;
+        });
+    }
+    update(id, updatedOrder) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.ensureDataDir();
             const filePath = path_1.default.join(dataDir, `${(0, storageKey_1.storageKey)(id)}.json`);
-            yield promises_1.default.writeFile(filePath, JSON.stringify(data, null, 2));
+            yield promises_1.default.writeFile(filePath, JSON.stringify(updatedOrder, null, 2));
         });
     }
     delete(id) {
@@ -59,13 +85,15 @@ class JsonRepository {
             const filePath = path_1.default.join(dataDir, `${(0, storageKey_1.storageKey)(id)}.json`);
             try {
                 yield promises_1.default.unlink(filePath);
+                return true;
             }
             catch (error) {
-                if (error instanceof Error) {
-                    throw new Error('Error deleting file');
+                if (error.code === 'ENOENT') {
+                    return false; // File not found
                 }
+                throw new Error(`Error deleting order file: ${error.message}`);
             }
         });
     }
 }
-exports.jsonRepository = new JsonRepository();
+exports.orderRepository = new OrderRepository();

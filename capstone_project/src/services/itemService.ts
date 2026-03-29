@@ -46,8 +46,8 @@ class ItemService {
     const updatedItem = { ...existingItem, ...itemData, id };
     const result = await itemRepository.update(id, updatedItem);
     if (!result) {
-        // This case should ideally not happen if findById passed
-        throw new ApiError(500, `Failed to update item with ID ${id} for an unknown reason.`);
+      // This case should ideally not happen if findById passed
+      throw new ApiError(500, `Failed to update item with ID ${id} for an unknown reason.`);
     }
     return result;
   }

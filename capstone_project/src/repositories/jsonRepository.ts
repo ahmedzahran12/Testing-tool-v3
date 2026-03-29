@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { storageKey } from '../utils/storageKey';
 
 const dataDir = path.join(__dirname, '../data');
 
@@ -14,12 +15,12 @@ class JsonRepository {
 
   async create(id: string, data: any) {
     await this.ensureDataDir();
-    const filePath = path.join(dataDir, `${id}.json`);
+    const filePath = path.join(dataDir, `${storageKey(id)}.json`);
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
   }
 
   async get(id: string) {
-    const filePath = path.join(dataDir, `${id}.json`);
+    const filePath = path.join(dataDir, `${storageKey(id)}.json`);
     try {
       const data = await fs.readFile(filePath, 'utf-8');
       return JSON.parse(data);
@@ -30,12 +31,12 @@ class JsonRepository {
 
   async update(id: string, data: any) {
     await this.ensureDataDir();
-    const filePath = path.join(dataDir, `${id}.json`);
+    const filePath = path.join(dataDir, `${storageKey(id)}.json`);
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
   }
 
   async delete(id: string) {
-    const filePath = path.join(dataDir, `${id}.json`);
+    const filePath = path.join(dataDir, `${storageKey(id)}.json`);
     try {
       await fs.unlink(filePath);
     } catch (error) {

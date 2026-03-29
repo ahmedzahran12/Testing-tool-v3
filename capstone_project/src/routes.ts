@@ -41,6 +41,7 @@ router.delete('/orders/:id', authMiddleware, authorizeRoles(['admin']), orderCon
 router.get('/orders/paid', authMiddleware, authorizeRoles(['admin']), orderController.listPaidOrders);
 // Checkout items (Customer only)
 router.post('/orders/:id/checkout', authMiddleware, authorizeRoles(['customer']), orderController.checkoutOrder);
-
+// Cancel scheduled order (Customer only)
+router.post('/orders/:id/cancel', authMiddleware, authorizeRoles(['customer']), orderController.cancelOrder);
 
 export { router };

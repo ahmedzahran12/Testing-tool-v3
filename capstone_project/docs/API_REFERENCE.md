@@ -392,3 +392,47 @@ All order management endpoints have specific authentication and authorization ru
       "error": "Unauthorized: This order does not belong to the provided customer ID."
     }
     ```
+
+### `POST /orders/:id/cancel`
+
+*   **Description:** Cancels an unpaid order. This operation restores the stock of the items contained in the order.
+*   **Authentication:** Required (Customer only). The customer ID from the authenticated user must match the order's customer ID.
+*   **Path Parameters:**
+    *   `id` (string, required): The unique identifier of the order to cancel.
+*   **Request Body:** None.
+*   **Response (Success - 200 OK):**
+    ```json
+    {
+      "id": "1700000000003",
+      "customerId": "customer123",
+      "items": [...],
+      "total": 1200.00,
+      "status": "cancelled",
+      "createdAt": 1700000000003,
+      "paid": false
+    }
+    ```
+*   **Response (Error - 400 Bad Request):**
+    ```json
+    {
+      "error": "Cannot cancel an order that has already been paid."
+    }
+    ```
+*   **Response (Error - 403 Forbidden):**
+    ```json
+    {
+      "error": "Forbidden: admin does not have access."
+    }
+    ```
+*   **Response (Error - 404 Not Found):**
+    ```json
+    {
+      "error": "Order with ID 1700000000003 not found."
+    }
+    ```
+*   **Response (Error - 401 Unauthorized):**
+    ```json
+    {
+      "error": "Unauthorized: This order does not belong to you."
+    }
+    ```

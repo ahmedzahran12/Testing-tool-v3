@@ -102,6 +102,27 @@ This document outlines common API interaction flows for both customers and admin
             ]
             ```
 
+### 5. Cancelling an Order
+
+*   **Goal:** Cancel a pending (unpaid) order and release the reserved items back to the store inventory.
+*   **Steps:**
+    1.  **`POST /orders/:id/cancel`**: Customer sends a request to cancel their pending order.
+        *   **Path Parameters:** `id` = `orderXYZ` (the ID of the pending order).
+        *   **Request Headers:** `Authorization: Bearer <customer_token>`
+        *   **Request Body:** None.
+        *   **Response:** The updated order object with `status: "cancelled"`.
+            ```json
+            {
+              "id": "orderXYZ",
+              "customerId": "customer123",
+              "items": [...],
+              "total": 1250.00,
+              "status": "cancelled",
+              "createdAt": 1700000000000,
+              "paid": false
+            }
+            ```
+
 ---
 
 ## Administrator Flows

@@ -37,10 +37,11 @@ class AuthService {
             const users = yield this.getUsers();
             const user = users.find((u) => u.username === username && u.password === password);
             if (user) {
+                const role = user.isAdmin ? 'admin' : 'customer';
                 const payload = {
+                    id: user.id || username, // Assuming 'id' exists or use username as fallback
                     username: user.username,
-                    details: user.details,
-                    date: new Date(),
+                    role: role,
                 };
                 return jsonwebtoken_1.default.sign(payload, JWT_SECRET, { expiresIn: '1h' });
             }
@@ -49,7 +50,8 @@ class AuthService {
     }
     verifyToken(token) {
         try {
-            return jsonwebtoken_1.default.verify(token, JWT_SECRET);
+            const decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+            return decoded;
         }
         catch (error) {
             return null;
@@ -68,6 +70,9 @@ class AuthService {
             const users = yield this.getUsers();
             const adminUser = users.find((u) => u.username === username && u.password === password && u.isAdmin);
             if (adminUser) {
+                // Attach user info to the request for Basic Auth as well
+                // This part needs to be handled in the middleware that uses getAdminBasicAuth
+                // For now, just return authorized true
                 return cb(null, true);
             }
             else {

@@ -18,11 +18,11 @@ class OrderService {
 
     for (const itemDetail of itemsDetails) {
       // itemService.findById now throws ApiError(404) if not found
-      const item = await itemService.findById(itemDetail.itemId); 
+      const item = await itemService.findById(itemDetail.itemId);
       if (item.stock < itemDetail.quantity) {
         throw new ApiError(400, `Not enough stock for item: ${item.name}. Available: ${item.stock}, Requested: ${itemDetail.quantity}`);
       }
-      
+
       const orderItem: OrderItem = {
         itemId: item.id,
         name: item.name,
@@ -67,7 +67,7 @@ class OrderService {
     // Re-increment stock for deleted order items (simplified rollback)
     for (const orderItem of orderToDelete.items) {
       // itemService.findById now throws ApiError(404) if not found
-      const item = await itemService.findById(orderItem.itemId); 
+      const item = await itemService.findById(orderItem.itemId);
       await itemService.update(item.id, { stock: item.stock + orderItem.quantity });
     }
 
@@ -100,6 +100,24 @@ class OrderService {
 
     await orderRepository.update(orderId, orderToCheckout);
     return orderToCheckout;
+  }
+  async cancelOrder(orderId: string, customerId: string): Promise<Order> {
+    const orderToCancel = await orderRepository.findById(orderId);
+    if (!orderToCancel) throw new ApiError(404, `Order with ID ${orderId} not found.`);
+    if (orderToCancel.customerId !== customerId) throw new ApiError(401, 'Unauthorized: This order does not belong to you.');
+    if (orderToCancel.paid) throw new ApiError(400, 'Cannot cancel an order that has already been paid.');
+    if (orderToCancel.status === 'cancelled') throw new ApiError(400, 'Order is already cancelled.');
+
+    orderToCancel.status = 'cancelled';
+    await orderRepository.update(orderId, orderToCancel);
+
+    // Restore stock for the cancelled order items
+    for (const orderItem of orderToCancel.items) {
+      const item = await itemService.findById(orderItem.itemId);
+      await itemService.update(item.id, { stock: item.stock + orderItem.quantity });
+    }
+
+    return orderToCancel;
   }
 }
 
