@@ -47,7 +47,7 @@ All item management endpoints (except `GET /items` and `GET /items/:id`) require
 
 ### `GET /items`
 
-*   **Description:** Retrieves a list of all available items.
+*   **Description:** Retrieves a list of all available (active) items. Soft-deleted items are excluded.
 *   **Authentication:** Required (Customer or Admin).
 *   **Request Body:** None.
 *   **Response (Success - 200 OK):**
@@ -78,7 +78,7 @@ All item management endpoints (except `GET /items` and `GET /items/:id`) require
 
 ### `GET /items/:id`
 
-*   **Description:** Retrieves details for a specific item by its ID.
+*   **Description:** Retrieves details for a specific active item by its ID. Lookups for soft-deleted (inactive) items will return a 404 Not Found.
 *   **Authentication:** Required (Customer or Admin).
 *   **Path Parameters:**
     *   `id` (string, required): The unique identifier of the item.
@@ -140,7 +140,7 @@ All item management endpoints (except `GET /items` and `GET /items/:id`) require
 
 ### `PUT /items/:id`
 
-*   **Description:** Updates an existing item's details.
+*   **Description:** Updates an existing active item's details. Attempting to update a soft-deleted item will return a 404 Not Found.
 *   **Authentication:** Required (Admin only).
 *   **Path Parameters:**
     *   `id` (string, required): The unique identifier of the item to update.
@@ -179,7 +179,7 @@ All item management endpoints (except `GET /items` and `GET /items/:id`) require
 
 ### `DELETE /items/:id`
 
-*   **Description:** Deletes an item by its ID.
+*   **Description:** Soft-deletes an item by its ID (marks it as `isActive: false`). The original data record remains on the server but is hidden from standard queries.
 *   **Authentication:** Required (Admin only).
 *   **Path Parameters:**
     *   `id` (string, required): The unique identifier of the item to delete.

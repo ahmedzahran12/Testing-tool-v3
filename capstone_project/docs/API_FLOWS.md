@@ -153,7 +153,7 @@ This document outlines common API interaction flows for both customers and admin
             }
             ```
         *   **Response:** The updated item object.
-    3.  **`DELETE /items/:id`**: Admin removes a product.
+    3.  **`DELETE /items/:id`**: Admin soft-deletes a product (marks it as inactive, removing it from catalogue views but retaining order history integrity).
         *   **Path Parameters:** `id` = `item2`
         *   **Request Headers:** `Authorization: Bearer <admin_token>`
         *   **Response:** 204 No Content.
