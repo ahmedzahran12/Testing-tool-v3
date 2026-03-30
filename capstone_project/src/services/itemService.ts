@@ -5,12 +5,13 @@ import ApiError from '../utils/ApiError';
 
 class ItemService {
   async findAll(): Promise<Item[]> {
-    return itemRepository.findAll();
+    const items = await itemRepository.findAll();
+    return items.filter(item => item.isActive !== false);
   }
 
   async findById(id: string): Promise<Item> {
     const item = await itemRepository.findById(id);
-    if (!item) {
+    if (!item || item.isActive === false) {
       throw new ApiError(404, `Item with ID ${id} not found.`);
     }
     return item;
@@ -27,12 +28,14 @@ class ItemService {
     if (itemData.stock < 0) {
       throw new ApiError(400, 'Item stock cannot be negative.');
     }
-    return itemRepository.create(itemData);
+    
+    const newItem = { ...itemData, isActive: true };
+    return itemRepository.create(newItem);
   }
 
   async update(id: string, itemData: Partial<Item>): Promise<Item> {
     const existingItem = await itemRepository.findById(id);
-    if (!existingItem) {
+    if (!existingItem || existingItem.isActive === false) {
       throw new ApiError(404, `Item with ID ${id} not found.`);
     }
 
@@ -53,10 +56,12 @@ class ItemService {
   }
 
   async delete(id: string): Promise<void> {
-    const deleted = await itemRepository.delete(id);
-    if (!deleted) {
+    const existingItem = await itemRepository.findById(id);
+    if (!existingItem || existingItem.isActive === false) {
       throw new ApiError(404, `Item with ID ${id} not found.`);
     }
+    existingItem.isActive = false;
+    await itemRepository.update(id, existingItem);
   }
 }
 

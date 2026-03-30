@@ -8,6 +8,7 @@ export interface Item {
   description: string;
   price: number;
   stock: number;
+  isActive?: boolean;
 }
 
 export interface OrderItem {
