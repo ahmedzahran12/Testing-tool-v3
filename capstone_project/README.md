@@ -98,3 +98,31 @@ All `/json` routes are protected and require authentication.
 | `PUT`    | `/json/:id`  | Replace a JSON object by ID.     | `{ "name": "new name" }`           | `{ "id": "...", "name": "new name", "value": 123 }`  |
 | `PATCH`  | `/json/:id`  | Partially update a JSON object.  | `{ "value": 456 }`                 | `{ "id": "...", "name": "new name", "value": 456 }`  |
 | `DELETE` | `/json/:id`  | Delete a JSON object by ID.      | (None)                             | `204 No Content`                                     |
+
+### Item Management (Protected)
+
+All `/items` routes require authentication. Create, Update, and Delete are admin-only.
+
+| Method   | Endpoint      | Role     | Description              | Request Body (Example)                                                    |
+| :------- | :------------ | :------- | :----------------------- | :------------------------------------------------------------------------ |
+| `GET`    | `/items`      | Any      | List all items.          | (None)                                                                    |
+| `GET`    | `/items/:id`  | Any      | Get a single item by ID. | (None)                                                                    |
+| `POST`   | `/items`      | Admin    | Create a new item.       | `{ "name": "Widget", "description": "A widget", "price": 9.99, "stock": 100 }` |
+| `PUT`    | `/items/:id`  | Admin    | Update an existing item. | `{ "name": "Widget V2", "description": "Updated", "price": 12.99, "stock": 80 }` |
+| `DELETE` | `/items/:id`  | Admin    | Delete an item.          | (None)                                                                    |
+
+### Order Management (Protected)
+
+All `/orders` routes require authentication. Roles are specified per endpoint.
+
+| Method   | Endpoint                      | Role     | Description                           | Request Body (Example)                                                         |
+| :------- | :---------------------------- | :------- | :------------------------------------ | :----------------------------------------------------------------------------- |
+| `POST`   | `/orders`                     | Admin    | Create a new order.                   | `{ "customerId": "user1", "items": [{ "itemId": "123", "quantity": 2 }] }`     |
+| `GET`    | `/orders`                     | Any      | List orders (customers see own only). | (None)                                                                         |
+| `DELETE` | `/orders/:id`                 | Admin    | Delete an order and restore stock.    | (None)                                                                         |
+| `GET`    | `/orders/paid`                | Admin    | List all paid orders.                 | (None)                                                                         |
+| `POST`   | `/orders/:id/checkout`        | Customer | Checkout (pay for) an order.          | (None)                                                                         |
+| `POST`   | `/orders/:id/cancel`          | Customer | Cancel a pending order.               | (None)                                                                         |
+| `PATCH`  | `/orders/:id/items/:itemId`   | Customer | Update item quantity in an order.     | `{ "quantity": 5 }`                                                            |
+| `DELETE` | `/orders/:id/items/:itemId`   | Customer | Remove an item from a pending order.  | (None)                                                                         |
+

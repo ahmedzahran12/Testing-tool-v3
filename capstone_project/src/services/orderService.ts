@@ -119,6 +119,34 @@ class OrderService {
 
     return orderToCancel;
   }
+  async updateOrderItemQuantity(orderId: string, customerId: string, itemId: string, newQuantity: number): Promise<Order> {
+    const orderToUpdate = await orderRepository.findById(orderId);
+    if (!orderToUpdate) throw new ApiError(404, `Order with ID ${orderId} not found.`);
+    if (orderToUpdate.customerId !== customerId) throw new ApiError(401, 'Unauthorized: This order does not belong to you.');
+    if (orderToUpdate.status !== 'pending') throw new ApiError(400, 'Can only update pending orders.');
+
+    const orderItem = orderToUpdate.items.find(i => i.itemId === itemId);
+    if (!orderItem) throw new ApiError(404, `Item with ID ${itemId} not found in this order.`);
+
+    const item = await itemService.findById(itemId);
+    const difference = newQuantity - orderItem.quantity;
+
+    if (item.stock < difference) {
+      throw new ApiError(400, `Not enough stock. Available: ${item.stock}`);
+    }
+
+    // Adjust global stock
+    await itemService.update(item.id, { stock: item.stock - difference });
+
+    // Update order item
+    orderItem.quantity = newQuantity;
+
+    // Recalculate total natively
+    orderToUpdate.total = orderToUpdate.items.reduce((sum, current) => sum + (current.price * current.quantity), 0);
+
+    await orderRepository.update(orderId, orderToUpdate);
+    return orderToUpdate;
+  }
 }
 
 export const orderService = new OrderService();

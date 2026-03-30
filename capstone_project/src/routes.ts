@@ -43,5 +43,7 @@ router.get('/orders/paid', authMiddleware, authorizeRoles(['admin']), orderContr
 router.post('/orders/:id/checkout', authMiddleware, authorizeRoles(['customer']), orderController.checkoutOrder);
 // Cancel scheduled order (Customer only)
 router.post('/orders/:id/cancel', authMiddleware, authorizeRoles(['customer']), orderController.cancelOrder);
+// Update item quantity in an order (Customer only)
+router.patch('/orders/:id/items/:itemId', authMiddleware, authorizeRoles(['customer']), orderController.updateItemQuantity);
 
 export { router };

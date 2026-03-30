@@ -37,7 +37,7 @@ export interface User {
 declare global {
   namespace Express {
     interface Request {
-      user?: User; 
+      user?: User;
       auth?: { user: string; password?: string }; // Added for express-basic-auth
     }
   }
