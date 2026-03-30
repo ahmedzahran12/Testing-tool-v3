@@ -32,6 +32,18 @@ class OrderController {
       if (!id) {
         throw new ApiError(400, 'Order ID is required.');
       }
+
+      // Customer-specific role validations
+      if (req.user?.role === 'customer') {
+        const order = await orderService.findById(id); // orderService.findById throws 404 if not found
+        if (order.customerId !== req.user.id) {
+          throw new ApiError(403, 'Forbidden: You can only delete your own orders.');
+        }
+        if (order.status !== 'pending') {
+          throw new ApiError(403, 'Forbidden: You cannot cancel an order that has already been paid or shipped.');
+        }
+      }
+
       await orderService.deleteOrder(id);
       res.status(204).send();
     } catch (error) {

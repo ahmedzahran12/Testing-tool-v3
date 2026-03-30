@@ -35,8 +35,8 @@ router.delete('/items/:id', authMiddleware, authorizeRoles(['admin']), itemContr
 router.post('/orders', authMiddleware, authorizeRoles(['admin']), orderController.createOrder);
 // List orders (Customer and Admin) - customer can only list their own, admin can list all
 router.get('/orders', authMiddleware, orderController.listOrders);
-// Delete order (Admin only)
-router.delete('/orders/:id', authMiddleware, authorizeRoles(['admin']), orderController.deleteOrder);
+// Delete/Cancel order (Admin and Customer)
+router.delete('/orders/:id', authMiddleware, authorizeRoles(['admin', 'customer']), orderController.deleteOrder);
 // List paid orders (Admin only)
 router.get('/orders/paid', authMiddleware, authorizeRoles(['admin']), orderController.listPaidOrders);
 // Checkout items (Customer only)

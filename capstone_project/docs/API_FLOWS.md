@@ -102,6 +102,15 @@ This document outlines common API interaction flows for both customers and admin
             ]
             ```
 
+### 5. Cancelling a Pending Order
+
+*   **Goal:** A customer decides to empty their cart (cancel their order) before paying.
+*   **Steps:**
+    1.  **`DELETE /orders/:id`**: Customer sends a request to cancel their specific order.
+        *   **Path Parameters:** `id` = `orderABC`
+        *   **Request Headers:** `Authorization: Bearer <customer_token>`
+        *   **Response:** 204 No Content. (The reserved stock is automatically returned to the store).
+
 ---
 
 ## Administrator Flows

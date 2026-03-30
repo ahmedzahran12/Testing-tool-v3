@@ -305,7 +305,7 @@ All order management endpoints have specific authentication and authorization ru
 ### `DELETE /orders/:id`
 
 *   **Description:** Deletes an order by its ID. This operation also increments the stock of the items contained in the order.
-*   **Authentication:** Required (Admin only).
+*   **Authentication:** Required (Admin or Customer). Customers can only delete their own `pending` orders.
 *   **Path Parameters:**
     *   `id` (string, required): The unique identifier of the order to delete.
 *   **Request Body:** None.
@@ -313,7 +313,13 @@ All order management endpoints have specific authentication and authorization ru
 *   **Response (Error - 403 Forbidden):**
     ```json
     {
-      "error": "Forbidden: customer does not have access."
+      "error": "Forbidden: You can only delete your own orders."
+    }
+    ```
+    *(or)*
+    ```json
+    {
+      "error": "Forbidden: You cannot cancel an order that has already been paid or shipped."
     }
     ```
 *   **Response (Error - 404 Not Found):**

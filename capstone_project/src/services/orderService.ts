@@ -50,6 +50,14 @@ class OrderService {
     return newOrder;
   }
 
+  async findById(orderId: string): Promise<Order> {
+    const order = await orderRepository.findById(orderId);
+    if (!order) {
+      throw new ApiError(404, `Order with ID ${orderId} not found.`);
+    }
+    return order;
+  }
+
   async listOrders(customerId?: string): Promise<Order[]> {
     const allOrders = await orderRepository.findAll();
     if (customerId) {

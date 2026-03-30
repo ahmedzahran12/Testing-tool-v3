@@ -8,32 +8,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authController = void 0;
 const authService_1 = require("../services/authService");
+const validator_1 = require("../validation/validator");
+const schemas_1 = require("../validation/schemas");
+const ApiError_1 = __importDefault(require("../utils/ApiError"));
 class AuthController {
-    login(req, res) {
+    login(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, password } = req.body;
-            if (!username || !password) {
-                return res.status(400).json({ error: 'Username and password are required' });
-            }
             try {
+                yield (0, validator_1.validate)(schemas_1.loginSchema)(req, res, () => { });
+                const { username, password } = req.body;
                 const token = yield authService_1.authService.generateToken(username, password);
                 if (token) {
                     res.json({ token });
                 }
                 else {
-                    res.status(401).json({ error: 'Invalid credentials' });
+                    throw new ApiError_1.default(401, 'Invalid credentials');
                 }
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ error: error.message });
-                }
-                else {
-                    res.status(500).json({ error: 'An unknown error occurred' });
-                }
+                next(error);
             }
         });
     }
