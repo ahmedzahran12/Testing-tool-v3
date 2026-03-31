@@ -8,12 +8,14 @@ export interface Item {
   description: string;
   price: number;
   stock: number;
+  discount: number; // Discount percentage (0–100). Defaults to 0 if not provided.
 }
 
 export interface OrderItem {
   itemId: string;
   name: string;
   price: number;
+  discount: number; // Discount percentage snapshotted from item at order creation time.
   quantity: number;
 }
 
