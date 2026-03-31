@@ -40,3 +40,5 @@ router.delete('/orders/:id', authMiddleware_1.authMiddleware, (0, authMiddleware
 router.get('/orders/paid', authMiddleware_1.authMiddleware, (0, authMiddleware_1.authorizeRoles)(['admin']), orderController_1.orderController.listPaidOrders);
 // Checkout items (Customer only)
 router.post('/orders/:id/checkout', authMiddleware_1.authMiddleware, (0, authMiddleware_1.authorizeRoles)(['customer']), orderController_1.orderController.checkoutOrder);
+// Ship order (Admin only)
+router.post('/orders/:id/ship', authMiddleware_1.authMiddleware, (0, authMiddleware_1.authorizeRoles)(['admin']), orderController_1.orderController.shipOrder);

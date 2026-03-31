@@ -109,6 +109,21 @@ class OrderService {
     await orderRepository.update(orderId, orderToCheckout);
     return orderToCheckout;
   }
+
+  async shipOrder(orderId: string): Promise<Order> {
+    const orderToShip = await orderRepository.findById(orderId);
+    if (!orderToShip) {
+      throw new ApiError(404, `Order with ID ${orderId} not found.`);
+    }
+    if (orderToShip.status === 'shipped') {
+      throw new ApiError(400, `Order with ID ${orderId} has already been shipped.`);
+    }
+
+    orderToShip.status = 'shipped';
+
+    await orderRepository.update(orderId, orderToShip);
+    return orderToShip;
+  }
 }
 
 export const orderService = new OrderService();

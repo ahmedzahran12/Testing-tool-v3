@@ -119,5 +119,19 @@ class OrderService {
             return orderToCheckout;
         });
     }
+    shipOrder(orderId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const orderToShip = yield orderRepository_1.orderRepository.findById(orderId);
+            if (!orderToShip) {
+                throw new ApiError_1.default(404, `Order with ID ${orderId} not found.`);
+            }
+            if (orderToShip.status === 'shipped') {
+                throw new ApiError_1.default(400, `Order with ID ${orderId} has already been shipped.`);
+            }
+            orderToShip.status = 'shipped';
+            yield orderRepository_1.orderRepository.update(orderId, orderToShip);
+            return orderToShip;
+        });
+    }
 }
 exports.orderService = new OrderService();

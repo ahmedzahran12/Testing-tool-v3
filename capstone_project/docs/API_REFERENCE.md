@@ -398,3 +398,41 @@ All order management endpoints have specific authentication and authorization ru
       "error": "Unauthorized: This order does not belong to the provided customer ID."
     }
     ```
+
+### `POST /orders/:id/ship`
+
+*   **Description:** Marks an order as shipped.
+*   **Authentication:** Required (Admin only).
+*   **Path Parameters:**
+    *   `id` (string, required): The unique identifier of the order to ship.
+*   **Request Body:** None.
+*   **Response (Success - 200 OK):**
+    ```json
+    {
+      "id": "1700000000003",
+      "customerId": "customer123",
+      "items": [...],
+      "total": 1200.00,
+      "status": "shipped",
+      "createdAt": 1700000000003,
+      "paid": false
+    }
+    ```
+*   **Response (Error - 400 Bad Request):**
+    ```json
+    {
+      "error": "Order with ID 1700000000003 has already been shipped."
+    }
+    ```
+*   **Response (Error - 403 Forbidden):**
+    ```json
+    {
+      "error": "Forbidden: customer does not have access."
+    }
+    ```
+*   **Response (Error - 404 Not Found):**
+    ```json
+    {
+      "error": "Order with ID 1700000000003 not found."
+    }
+    ```

@@ -78,6 +78,20 @@ class OrderController {
       next(error);
     }
   }
+
+  async shipOrder(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      if (!orderId) {
+        throw new ApiError(400, 'Order ID is required.');
+      }
+
+      const shippedOrder = await orderService.shipOrder(orderId);
+      res.status(200).json(shippedOrder);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const orderController = new OrderController();

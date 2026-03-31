@@ -101,5 +101,20 @@ class OrderController {
             }
         });
     }
+    shipOrder(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+                if (!orderId) {
+                    throw new ApiError_1.default(400, 'Order ID is required.');
+                }
+                const shippedOrder = yield orderService_1.orderService.shipOrder(orderId);
+                res.status(200).json(shippedOrder);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
 }
 exports.orderController = new OrderController();
